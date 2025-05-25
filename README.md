@@ -27,7 +27,7 @@ graph_cluster.py
 
 
 # 输出格式
-- 相似度：
+- 相似度：key是当前node，value是和当前node最匹配的topk nodes
   ```json
   "1": [
       {
