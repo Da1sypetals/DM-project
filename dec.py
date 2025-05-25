@@ -30,6 +30,7 @@ from sklearn.cluster import KMeans
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
+import json
 
 
 # ------------------------- 工具函数 -------------------------
@@ -188,6 +189,7 @@ def main():
         n_clusters=args.clusters,
         device=device,
     )
+
     # 预训练 & 初始化 & 训练
     dec.pretrain(x, args.pretrain_epochs, args.batch_size, args.lr)
     dec.initialize_cluster(x)
@@ -199,6 +201,12 @@ def main():
     np.save(os.path.join(args.output, "latent.npy"), z)
     np.save(os.path.join(args.output, "q.npy"), q)
     np.save(os.path.join(args.output, "y_pred.npy"), y)
+
+    # 保存 y_pred 为 JSON 格式：node_id → cluster_id
+    y_dict = {str(i): int(label) for i, label in enumerate(y)}
+    with open(os.path.join(args.output, "y_pred.json"), "w") as f:
+        json.dump(y_dict, f, indent=2)
+
     print(f"Results saved to {args.output}")
 
 
