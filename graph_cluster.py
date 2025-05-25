@@ -28,6 +28,7 @@ import os
 from sklearn.metrics.pairwise import cosine_similarity
 import community as community_louvain  # pip install python-louvain
 from networkx.algorithms.community import label_propagation_communities
+from collections import defaultdict
 
 # Infomap 引入
 try:
@@ -95,6 +96,26 @@ def save_json(data: dict, path: str):
         json.dump(data, f, indent=2)
 
 
+def community_to_cluster_format(
+    partition: dict[str, int],
+) -> dict[str, list[dict[str, float]]]:
+    """
+    将节点 → 社区 映射 转为 cluster 格式输出：
+    同一社区的节点互为相似邻居，sim = 1.0
+    """
+    community_map = defaultdict(list)
+    for node, cid in partition.items():
+        community_map[cid].append(int(node))
+
+    cluster_result = defaultdict(list)
+    for members in community_map.values():
+        for i in members:
+            cluster_result[str(i)].extend(
+                {"node": int(j), "sim": 1.0} for j in members if j != i
+            )
+    return cluster_result
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="社区发现 (Louvain / Label Propagation / Infomap)"
@@ -102,6 +123,9 @@ def main():
     parser.add_argument("--emb", required=True, help="输入 embedding 的 .npy 文件路径")
     parser.add_argument("-o", "--output", required=True, help="输出目录")
     parser.add_argument("--k", type=int, default=10, help="构图近邻数")
+    parser.add_argument(
+        "--cluster", action="store_true", help="是否输出 _cluster.json 格式的相似节点"
+    )
     args = parser.parse_args()
 
     os.makedirs(args.output, exist_ok=True)
@@ -111,16 +135,28 @@ def main():
     print("运行 Louvain 社区发现...")
     louvain_result = run_louvain(G)
     save_json(louvain_result, os.path.join(args.output, "louvain.json"))
+    if args.cluster:
+        louvain_cluster = community_to_cluster_format(louvain_result)
+        save_json(louvain_cluster, os.path.join(args.output, "louvain_cluster.json"))
 
     print("运行 Label Propagation 社区发现...")
-    print("注意：Label Propagation 社区发现可能无法收敛，导致结果不准确。")
     labelprop_result = run_label_propagation(G)
     save_json(labelprop_result, os.path.join(args.output, "labelprop.json"))
+    if args.cluster:
+        labelprop_cluster = community_to_cluster_format(labelprop_result)
+        save_json(
+            labelprop_cluster, os.path.join(args.output, "labelprop_cluster.json")
+        )
 
     print("运行 Infomap 社区发现...")
     try:
         infomap_result = run_infomap(G)
         save_json(infomap_result, os.path.join(args.output, "infomap.json"))
+        if args.cluster:
+            infomap_cluster = community_to_cluster_format(infomap_result)
+            save_json(
+                infomap_cluster, os.path.join(args.output, "infomap_cluster.json")
+            )
     except ImportError as e:
         print(e)
 

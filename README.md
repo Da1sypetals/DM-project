@@ -22,5 +22,5 @@ graph_cluster.py
 
 - 建图：根据embedding，KNN 建图
 - Louvain
+- Infomap
 - LabelProp（效果很差）
-- Infomap (效果似乎也很差)
