@@ -18,4 +18,9 @@
 
 ## 基于图的方法：
 
-- 建图：
+graph_cluster.py
+
+- 建图：根据embedding，KNN 建图
+- Louvain
+- LabelProp（效果很差）
+- Infomap (效果似乎也很差)
