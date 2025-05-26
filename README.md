@@ -2,6 +2,13 @@
 
 输入：统一为`(num_user, embedding_dim)`.
 
+# 流程
+将原始数据跑data_prep.py和sub_data.py，得到embedding和subreddit的数据；
+送入similarity.py，得到recommendation；
+将recommendation和subreddit数据送入eval.py，指定topk（要推荐topk个用户给每个用户），得到准确率。iou大于0都算准。
+
+# 方法
+
 ## 简单相似度聚类方法
 
 直接对比embedding的距离并排序（cosine, euclidean, 经过二值化处理的 jaccard）
