@@ -24,6 +24,10 @@
   - model.py
   - train.py
   - transform_emb.py
+  - 流程：
+    - 先用相应数据跑跑train.py
+    - 再用transform_emb变换相应数据，得到latent
+    - 再跑similarity
 - DEC https://arxiv.org/pdf/1511.06335
   - dec.py
 
