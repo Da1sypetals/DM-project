@@ -3,9 +3,13 @@
 输入：统一为`(num_user, embedding_dim)`.
 
 # 流程
-将原始数据跑data_prep.py和sub_data.py，得到embedding和subreddit的数据；
-送入similarity.py，得到recommendation；
-将recommendation和subreddit数据送入eval.py，指定topk（要推荐topk个用户给每个用户），得到准确率。iou大于0都算准。
+- 将原始数据跑data_prep.py和sub_data.py，得到embedding和subreddit的数据；
+- 送入similarity.py，得到recommendation；
+- 送入rev_similarity.py，得到按照similarity降序排序的recommendation；
+- 将recommendation(或者rev_recommendation)和subreddit数据送入eval.py，指定topk（要推荐topk个用户给每个用户），得到准确率。
+  - iou大于0都算准。
+- 随机推荐：random_eval.py, 只提供subreddit数据，不提供recommendation，指定topk。
+
 
 # 方法
 
